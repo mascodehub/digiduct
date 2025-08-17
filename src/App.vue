@@ -1,7 +1,7 @@
 <template>
   <nav class="navigation">
     <ul v-if="!$route.path.startsWith('/admin')">
-      <router-link to="/">Home</router-link>
+      <!-- <router-link to="/">Home</router-link> -->
     </ul>
   </nav>
   <router-view></router-view>
