@@ -1,32 +1,21 @@
-<script>
-export default {
-  data() {
-    return {
-      count: 0,
-      total: 0,
-      a: 0,
-      b: 0,
-    };
-  },
+<template>
+  <nav class="navigation">
+    <ul v-if="!$route.path.startsWith('/admin')">
+      <router-link to="/">Home</router-link>
+    </ul>
+  </nav>
+  <router-view></router-view>
+</template>
 
-  methods: {
-    increment() {
-      this.count++;
-    },
-    perkalian(x, y) {
-      this.a = x;
-      this.b = y;
-      this.total = this.a * this.b;
-    },
-  },
-
-  mounted() {
-    console.log(`The initial count is ${this.count}.`);
-  },
-};
+<script setup>
+const isAdmin = localStorage.getItem("digitoken") != null;
 </script>
 
-<template>
-  <button @click="increment">Count is: {{ count }}</button>
-  <button @click="perkalian(5, 4)">Total is: {{ total }}</button>
-</template>
+<style scoped>
+.navigation ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  gap: 1em;
+}
+</style>
