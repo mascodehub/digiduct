@@ -1,3 +1,4 @@
+import router from '@/router';
 import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -12,7 +13,8 @@ const apiClient = axios.create({
 // Interceptor permintaan untuk secara otomatis menambahkan token
 apiClient.interceptors.request.use(
     config => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("digitoken");
+
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
@@ -36,6 +38,13 @@ apiClient.interceptors.response.use(
     error => {
         // Axios otomatis melemparkan kesalahan untuk status non-2xx
         // Kita bisa mengekstrak pesan kesalahan dari respons
+        if (error.response.data.rd === 'Invalid or expired token') {
+            localStorage.clear();
+            router.push({ name: 'admin/login' });
+
+            return;
+        }
+
         if (error.response && error.response.data && error.response.data.message) {
             throw new Error(error.response.data.message);
         }
@@ -51,10 +60,20 @@ apiClient.interceptors.response.use(
  */
 export async function apiFetch(path, options = {}) {
     try {
-        const response = await apiClient.request({
+        const { data, ...rest } = options;
+
+        const config = {
             url: path,
-            ...options,
-        });
+            ...rest,
+        };
+
+        if ((rest.method || "GET").toUpperCase() === "GET" && data) {
+            config.params = data;
+        } else if (data) {
+            config.data = data;
+        }
+
+        const response = await apiClient.request(config);
         return response.data; // Axios otomatis mengurai JSON ke .data
     } catch (error) {
         throw error;

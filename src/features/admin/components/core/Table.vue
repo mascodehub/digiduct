@@ -108,6 +108,8 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 
 library.add(faChevronLeft, faChevronRight)
 
+const emit = defineEmits(['update:page'])
+
 const props = defineProps({
     columns: { type: Array, required: true },
     rows: { type: Array, default: () => [] },
@@ -141,6 +143,7 @@ function changePage(newPage) {
     if (newPage < 1) return
     if (newPage > totalPages.value) return
     pagination.page = newPage
+    emit('update:page', newPage)
 }
 
 const computedRows = computed(() => {

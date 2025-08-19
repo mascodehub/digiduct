@@ -1,5 +1,10 @@
 <template>
-    <Table :columns="cols" :rows="props.rows" :loading="props.loading" :defaultSort="{ key: 'name', dir: 'asc' }">
+    <Table :columns="cols" :rows="rows" :loading="loading" v-model:page="currentPage"
+        :defaultSort="{ key: 'name', dir: 'asc' }">
+
+        <template #actions>
+            <slot name="actions"> </slot>
+        </template>
 
         <template #cell:price="{ row }">
             Rp {{ Number(row.price).toLocaleString('id-ID') }}
@@ -16,24 +21,46 @@
 </template>
 
 <script setup>
+import { onMounted, ref, watch } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTrash, faPencilAlt } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faPencilAlt, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 import Table from '../../components/core/Table.vue';
+import { list } from '../../services/category';
 
-library.add(faTrash, faPencilAlt)
+library.add(faTrash, faPencilAlt, faPlus)
 
-const props = defineProps({
-    rows: { type: Array, default: () => [] },
-    loading: { type: Boolean, default: false },
-})
+let rows = ref([])
+let loading = ref(true)
+let currentPage = ref(1)
 
 const cols = [
     { key: 'name', label: 'Name', sortable: true, class: '' },
-    { key: 'category', label: 'Category', sortable: true, class: 'text-center' },
-    { key: 'price', label: 'Price', sortable: true, class: 'text-right' }
 ];
 
 function edit(row) { console.log('edit', row); }
 function remove(row) { console.log('delete', row); }
+
+async function get_category(params) {
+    let listCategory = await list({ limit: params.limit, offset: params.offset });
+
+    if (listCategory.rc == 200) {
+        return listCategory.data;
+    } else {
+        // errorMessage.value = 'Invalid username or password.';
+    }
+}
+
+watch(currentPage, async (page) => {
+    loading.value = true
+    rows.value = await get_category({ limit: 10, offset: (page - 1) * 10 })
+    loading.value = false
+})
+
+onMounted(async () => {
+    loading.value = true
+    rows.value = await get_category({ limit: 10, offset: 0 })
+    loading.value = false
+})
+
 </script>
