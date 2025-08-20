@@ -38,9 +38,11 @@ apiClient.interceptors.response.use(
     error => {
         // Axios otomatis melemparkan kesalahan untuk status non-2xx
         // Kita bisa mengekstrak pesan kesalahan dari respons
+        console.log(error.response.data);
+        
         if (error.response.data.rd === 'Invalid or expired token') {
             localStorage.clear();
-            router.push({ name: 'admin/login' });
+            router.push({ name: 'admin-login' });
 
             return;
         }

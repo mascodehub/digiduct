@@ -3,8 +3,28 @@
         :defaultSort="{ key: 'name', dir: 'asc' }">
 
         <template #actions>
-            <slot name="actions"> </slot>
+            <button class="px-3 py-1 m-4 rounded bg-teal-600 text-white text-xs hover:bg-teal-700" @click="open = true">
+                <font-awesome-icon :icon="['fas', 'plus']" size="sm" /> Category
+            </button>
+            <Modal v-model="open" title-id="create-item-title" @confirm="save">
+                <template #header>Add Category</template>
+
+                <div class="space-y-3">
+                    <label class="block">
+                        <span class="text-sm text-gray-600">Name</span>
+                        <input v-model="form.name" class="mt-1 w-full rounded-lg border-gray-300 p-1" />
+                    </label>
+                </div>
+
+                <template #footer>
+                    <button class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                        @click="open = false">Cancel</button>
+                    <button class="px-4 py-2 rounded-lg bg-teal-600 text-white hover:bg-teal-700"
+                        @click="save">Submit</button>
+                </template>
+            </Modal>
         </template>
+
 
         <template #cell:price="{ row }">
             Rp {{ Number(row.price).toLocaleString('id-ID') }}
@@ -26,7 +46,11 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faTrash, faPencilAlt, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 import Table from '../../components/core/Table.vue';
-import { list } from '../../services/category';
+import Modal from '../../components/core/Modal.vue';
+import { add, list } from '../../services/category';
+
+const open = ref(false)
+const form = ref({ name: '' })
 
 library.add(faTrash, faPencilAlt, faPlus)
 
@@ -48,6 +72,20 @@ async function get_category(params) {
         return listCategory.data;
     } else {
         // errorMessage.value = 'Invalid username or password.';
+    }
+}
+
+async function save() {
+    let addCategory = await add({ name: form.value.name });
+
+    if (addCategory.rc == 200) {
+        open.value = false
+
+        loading.value = true
+        rows.value = await get_category({ limit: 10, offset: (currentPage - 1) * 10 })
+        loading.value = false
+    } else {
+        //   // errorMessage.value = 'Invalid username or password.';
     }
 }
 
