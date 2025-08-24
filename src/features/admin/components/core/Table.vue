@@ -5,7 +5,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="min-w-full border-collapse">
+            <table class="min-w-full border-collapse table-fixed">
                 <thead class="bg-gray-50">
                     <tr class="bg-slate-200">
                         <th class="px-4 py-3 w-20 text-center text-sm font-bold text-gray-700 select-none">No</th>

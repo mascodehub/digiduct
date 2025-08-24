@@ -12,3 +12,16 @@ export async function login(data) {
         throw error;
     }
 }
+
+export async function verifyToken(data) {
+    try {
+        const response = await apiFetch(`/auth/verify`, {
+            method: "POST",
+            data: data,
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}

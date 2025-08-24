@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import userRoutes from '../features/user/routes.js';
 import adminRoutes from '../features/admin/routes.js';
+import { verifyToken } from '@/features/admin/services/auth.js';
 
 const allRoutes = [...userRoutes, ...adminRoutes];
 
@@ -9,15 +10,19 @@ const router = createRouter({
     routes: allRoutes,
 });
 
-router.beforeEach((to, from, next) => {
-    const isAdmin = localStorage.getItem("digitoken") != null;
+router.beforeEach(async (to, from, next) => {
     
     if (to.path.startsWith("/admin")) {
+
+        const isAdmin = localStorage.getItem("digitoken") != null;
+
         if (!isAdmin && to.path !== "/admin/login") {
+            await verifyToken();
             return next("/admin/login");
         }
 
         if (isAdmin && to.path === "/admin/login") {
+            await verifyToken();
             return next("/admin");
         }
     }
